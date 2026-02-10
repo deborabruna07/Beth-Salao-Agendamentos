@@ -51,35 +51,7 @@ export const defaultServices: Service[] = [
   },
 ];
 
-export const initialAppointments: Appointment[] = [
-  {
-    id: 'a1',
-    clientName: 'Maria Silva',
-    serviceId: '2',
-    date: '2026-02-10',
-    startTime: '09:00',
-    endTime: '10:05',
-    status: 'confirmed',
-  },
-  {
-    id: 'a2',
-    clientName: 'Ana Costa',
-    serviceId: '1',
-    date: '2026-02-10',
-    startTime: '10:30',
-    endTime: '11:00',
-    status: 'confirmed',
-  },
-  {
-    id: 'a3',
-    clientName: 'Juliana Santos',
-    serviceId: '3',
-    date: '2026-02-11',
-    startTime: '14:00',
-    endTime: '15:40',
-    status: 'confirmed',
-  },
-];
+export const initialAppointments: Appointment[] = [];
 
 // Closed days (0=Sun, 1=Mon, ..., 6=Sat)
 export const closedDays = [0]; // Sunday closed

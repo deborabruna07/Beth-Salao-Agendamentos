@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 import {
   Trash2,
   Plus,
@@ -11,8 +12,10 @@ import {
   Clock,
   User,
   XCircle,
+  LogOut,
 } from 'lucide-react';
 import { useSalonStore } from '@/store/salonStore';
+import { useAuthStore } from '@/store/authStore';
 import { exportToCSV } from '@/lib/scheduling';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +34,9 @@ import { toast } from 'sonner';
 import Header from '@/components/salon/Header';
 
 const Admin = () => {
+  const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+
   const {
     services,
     appointments,
@@ -49,6 +55,12 @@ const Admin = () => {
   });
 
   const [activeTab, setActiveTab] = useState<'appointments' | 'services'>('appointments');
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Sessão encerrada com sucesso');
+    navigate('/'); // Agora redireciona para a página inicial
+  };
 
   const handleAddService = () => {
     if (!newService.name || !newService.activeTimeStart) return;
@@ -92,14 +104,25 @@ const Admin = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-8 flex items-start justify-between"
         >
-          <h1 className="font-display text-3xl font-bold text-foreground">
-            Painel Administrativo
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Gerencie serviços e agendamentos
-          </p>
+          <div>
+            <h1 className="font-display text-3xl font-bold text-foreground">
+              Painel Administrativo
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              Gerencie serviços e agendamentos
+            </p>
+          </div>
+          
+          <Button 
+            variant="ghost" 
+            onClick={handleLogout} 
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Sair
+          </Button>
         </motion.div>
 
         {/* Tabs */}
@@ -129,7 +152,6 @@ const Admin = () => {
 
         {activeTab === 'appointments' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            {/* Actions */}
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={handleExportCSV} className="gap-2">
                 <Download className="h-4 w-4" /> Exportar CSV
@@ -157,7 +179,6 @@ const Admin = () => {
               </AlertDialog>
             </div>
 
-            {/* Appointments list */}
             {confirmedAppointments.length === 0 ? (
               <div className="rounded-xl border border-border bg-card p-12 text-center shadow-card">
                 <Calendar className="mx-auto mb-3 h-10 w-10 text-muted-foreground/40" />

@@ -29,13 +29,13 @@ const Index = () => {
             </motion.div>
 
             <h1 className="font-display text-4xl font-bold leading-tight text-foreground sm:text-5xl">
-              Seu salão, sua{' '}
-              <span className="text-primary">agenda organizada</span>
+              Realce sua beleza no seu {' '}
+              <span className="text-primary">tempo e agende o seu momento.</span>
             </h1>
 
             <p className="mt-4 text-lg text-muted-foreground">
-              Sistema inteligente de agendamento que cuida dos horários
-              para você focar no que importa: seus clientes.
+              Escolha seu serviço favorito e agende um horário em poucos 
+              segundos. Sua melhor versão espera por você.
             </p>
 
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -45,6 +45,8 @@ const Index = () => {
                   Agendar Horário
                 </Button>
               </Link>
+              
+              {/* Este link será interceptado pelo PrivateRoute no App.tsx */}
               <Link to="/admin">
                 <Button size="lg" variant="outline" className="gap-2 px-8">
                   Painel Admin
@@ -61,21 +63,18 @@ const Index = () => {
           {[
             {
               icon: Clock,
-              title: 'Encaixes Inteligentes',
-              description:
-                'O sistema identifica tempos de espera e permite encaixes automáticos.',
+              title: 'Sua Hora, Suas Regras',
+              description: 'Agende o seu horário conosco onde estiver.',
             },
             {
               icon: Calendar,
               title: 'Agenda Dinâmica',
-              description:
-                'Visualize apenas horários disponíveis, sem conflitos.',
+              description: 'Visualize apenas horários disponíveis, sem conflitos.',
             },
             {
               icon: Sparkles,
-              title: 'Gestão Simples',
-              description:
-                'Cadastre serviços, gerencie agendamentos e exporte relatórios.',
+              title: 'Lembretes Automáticos',
+              description: 'Você recebe um aviso antes do seu horário para não esquecer.',
             },
           ].map((feature, i) => (
             <motion.div
@@ -99,7 +98,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-border py-8 text-center">
         <p className="text-sm text-muted-foreground">
           SGA — Desenvolvido por{' '}
