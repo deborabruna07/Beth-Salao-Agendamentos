@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 import {
   Trash2,
   Plus,
@@ -33,6 +34,7 @@ import {
 import { toast } from 'sonner';
 import Header from '@/components/salon/Header';
 
+
 const Admin = () => {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
@@ -45,6 +47,17 @@ const Admin = () => {
     cancelAppointment,
     clearAllAppointments,
   } = useSalonStore();
+
+const setAppointments = useSalonStore((state) => state.setAppointments);
+
+const fetchAppointments = useSalonStore((s) => s.fetchAppointments);
+const fetchServices = useSalonStore((s) => s.fetchServices);
+
+useEffect(() => {
+  fetchServices();
+  fetchAppointments();
+}, []);
+
 
   const [showAddService, setShowAddService] = useState(false);
   const [newService, setNewService] = useState({
