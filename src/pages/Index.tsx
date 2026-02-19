@@ -100,8 +100,7 @@ const Index = () => {
 
       <footer className="border-t border-border py-8 text-center">
         <p className="text-sm text-muted-foreground">
-          SGA — Desenvolvido por{' '}
-          <span className="font-medium text-foreground">Débora Bruna</span>
+          Beth Salão & Cosmetics
         </p>
       </footer>
     </div>

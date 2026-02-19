@@ -46,17 +46,18 @@ const Admin = () => {
     removeService,
     cancelAppointment,
     clearAllAppointments,
+    fetchAppointments,
+    fetchServices
   } = useSalonStore();
 
-const setAppointments = useSalonStore((state) => state.setAppointments);
+  // Estados de controle dos Modais
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(null);
 
-const fetchAppointments = useSalonStore((s) => s.fetchAppointments);
-const fetchServices = useSalonStore((s) => s.fetchServices);
-
-useEffect(() => {
-  fetchServices();
-  fetchAppointments();
-}, []);
+  useEffect(() => {
+    fetchServices();
+    fetchAppointments();
+  }, []);
 
 
   const [showAddService, setShowAddService] = useState(false);
@@ -100,9 +101,22 @@ useEffect(() => {
     toast.success('Relatório exportado!');
   };
 
-  const handleClearAll = () => {
-    clearAllAppointments();
-    toast.success('Todos os agendamentos foram removidos');
+  const handleClearAll = async () => {
+    try {
+      await clearAllAppointments();
+      setIsClearModalOpen(false);
+      toast.success("Todos os agendamentos foram removidos.");
+    } catch (error) {
+      toast.error("Erro ao remover agendamentos.");
+    }
+  };
+
+  const handleConfirmCancel = async () => {
+    if (appointmentToCancel) {
+      await cancelAppointment(appointmentToCancel);
+      setAppointmentToCancel(null);
+      toast.success("Agendamento cancelado.");
+    }
   };
 
   const confirmedAppointments = appointments
@@ -169,81 +183,99 @@ useEffect(() => {
               <Button variant="outline" onClick={handleExportCSV} className="gap-2">
                 <Download className="h-4 w-4" /> Exportar CSV
               </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="gap-2">
-                    <AlertTriangle className="h-4 w-4" /> Limpar Todos
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Esta ação irá remover TODOS os agendamentos permanentemente.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleClearAll}>
-                      Sim, limpar tudo
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+            <AlertDialog open={isClearModalOpen} onOpenChange={setIsClearModalOpen}>
+              <Button variant="destructive" className="gap-2" onClick={() => setIsClearModalOpen(true)}>
+                <AlertTriangle className="h-4 w-4" /> Limpar Todos
+              </Button>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação irá remover TODOS os agendamentos permanentemente.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearAll} className="bg-destructive hover:bg-destructive/90">
+                  Sim, limpar tudo
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
             </div>
 
-            {confirmedAppointments.length === 0 ? (
-              <div className="rounded-xl border border-border bg-card p-12 text-center shadow-card">
-                <Calendar className="mx-auto mb-3 h-10 w-10 text-muted-foreground/40" />
-                <p className="text-muted-foreground">Nenhum agendamento confirmado</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {confirmedAppointments.map((appt, i) => {
-                  const service = services.find((s) => s.id === appt.serviceId);
-                  return (
-                    <motion.div
-                      key={appt.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-primary" />
-                          <span className="font-medium text-foreground">{appt.clientName}</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          ✂️ {service?.name || 'Serviço removido'}
-                        </p>
-                        <p className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {format(new Date(appt.date + 'T12:00'), "dd/MM/yyyy")}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {appt.startTime} — {appt.endTime}
-                          </span>
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          cancelAppointment(appt.id);
-                          toast.success('Agendamento cancelado');
-                        }}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <XCircle className="h-4 w-4" />
-                      </Button>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
+{confirmedAppointments.length === 0 ? (
+  <div className="rounded-xl border border-border bg-card p-12 text-center shadow-card">
+    <Calendar className="mx-auto mb-3 h-10 w-10 text-muted-foreground/40" />
+    <p className="text-muted-foreground">Nenhum agendamento confirmado</p>
+  </div>
+) : (
+  <div className="space-y-3">
+    {confirmedAppointments.map((appt, i) => {
+      const service = services.find((s) => s.id === appt.serviceId);
+      return (
+        <motion.div
+          key={appt.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05 }}
+          className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card"
+        >
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-primary" />
+              <span className="font-medium text-foreground">{appt.clientName}</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              ✂️ {service?.name || 'Serviço removido'}
+            </p>
+            <p className="flex items-center gap-3 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                {format(new Date(appt.date + 'T12:00'), "dd/MM/yyyy")}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {appt.startTime} — {appt.endTime}
+              </span>
+            </p>
+          </div>
+          
+          {/* Botão agora apenas abre o modal de confirmação */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setAppointmentToCancel(appt.id)}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <XCircle className="h-4 w-4" />
+          </Button>
+        </motion.div>
+      );
+    })}
+
+    {/* Modal de Confirmação de Cancelamento Único */}
+    <AlertDialog 
+      open={!!appointmentToCancel} 
+      onOpenChange={(open) => !open && setAppointmentToCancel(null)}
+    >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação irá CANCELAR o agendamento permanentemente.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearAll} className="bg-destructive hover:bg-destructive/90">
+                  Sim, cancelar agendamento.
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+            </div>
+)}
           </motion.div>
         )}
 

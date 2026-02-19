@@ -13,11 +13,16 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import Header from '@/components/salon/Header';
 import { sendConfirmationEmail } from '@/services/emailService';
+import { useEffect } from 'react';
 
 const Booking = () => {
-  const { services, appointments, addAppointment } = useSalonStore();
+  const { services, appointments, addAppointment, fetchServices } = useSalonStore();
   const [step, setStep] = useState(0);
   const [isConfirmed, setIsConfirmed] = useState(false);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
   
   // Estado para os novos dados solicitados
   const [clientData, setClientData] = useState({
@@ -47,19 +52,20 @@ const Booking = () => {
   };
 
   const handleConfirm = async () => {
-    if (!clientData.name || !clientData.email || !selectedService || !selectedDate || !selectedTime) return;
+  if (!clientData.name || !clientData.email || !selectedService || !selectedDate || !selectedTime) return;
 
-    const endTime = calculateEndTime(selectedTime, selectedService);
-    
-    // Adiciona o agendamento localmente
-    addAppointment({
-      clientName: clientData.name,
-      serviceId: selectedService.id,
-      date: selectedDate,
-      startTime: selectedTime,
-      endTime,
-      status: 'confirmed',
-    });
+  const endTime = calculateEndTime(selectedTime, selectedService);
+  
+  addAppointment({
+    clientName: clientData.name,
+    clientWhatsapp: clientData.whatsapp,
+    clientEmail: clientData.email,
+    serviceId: selectedService.id,
+    date: selectedDate,
+    startTime: selectedTime,
+    endTime,
+    status: 'confirmed',
+  });
 
     // Envio do e-mail via API Brevo
     const emailPromise = sendConfirmationEmail(

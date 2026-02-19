@@ -14,7 +14,9 @@ interface SalonStore {
   removeService: (id: string) => Promise<void>;
 
   addAppointment: (appointment: Omit<Appointment, 'id'>) => Promise<void>;
+  
   cancelAppointment: (id: string) => Promise<void>;
+  clearAllAppointments: () => Promise<void>;
 
   setAppointments: (appointments: Appointment[]) => void;
 }
@@ -46,10 +48,10 @@ export const useSalonStore = create<SalonStore>((set, get) => ({
     set({ services: formatted });
   },
 
-  // 🔥 BUSCAR AGENDAMENTOS
+  // BUSCAR AGENDAMENTOS
   fetchAppointments: async () => {
     const { data, error } = await supabase
-      .from('agendamentos')
+      .from('appointments')
       .select('*')
       .order('date', { ascending: true });
 
@@ -73,7 +75,7 @@ export const useSalonStore = create<SalonStore>((set, get) => ({
     set({ appointments: formatted });
   },
 
-  // 🔥 ADICIONAR SERVIÇO
+  // ADICIONAR SERVIÇO
   addService: async (service) => {
     const totalTime =
       service.activeTimeStart +
@@ -113,7 +115,7 @@ export const useSalonStore = create<SalonStore>((set, get) => ({
     set({ services: updated });
   },
 
-  // 🔥 REMOVER SERVIÇO
+  // REMOVER SERVIÇO
   removeService: async (id) => {
     await supabase.from('services').delete().eq('id', id);
 
@@ -122,10 +124,10 @@ export const useSalonStore = create<SalonStore>((set, get) => ({
     set({ services: updated });
   },
 
-  // 🔥 ADICIONAR AGENDAMENTO
+  // ADICIONAR AGENDAMENTO
   addAppointment: async (appointment) => {
     const { data, error } = await supabase
-      .from('agendamentos')
+      .from('appointments')
       .insert([
         {
           client_name: appointment.clientName,
@@ -159,14 +161,28 @@ export const useSalonStore = create<SalonStore>((set, get) => ({
     };
 
     set({
-      appointments: [...get().appointments, formatted],
+appointments: [...get().appointments, formatted],
     });
   },
 
-  // 🔥 CANCELAR AGENDAMENTO
+clearAllAppointments: async () => {
+  const { error } = await supabase
+    .from('appointments')
+    .delete()
+    .not('id', 'is', null); // Deleta todos onde o ID não é nulo
+
+  if (error) {
+    console.error('Erro ao limpar tudo:', error);
+    throw error;
+  }
+
+  set({ appointments: [] });
+},
+
+  // CANCELAR AGENDAMENTO
   cancelAppointment: async (id) => {
     await supabase
-      .from('agendamentos')
+      .from('appointments')
       .update({ status: 'cancelled' })
       .eq('id', id);
 

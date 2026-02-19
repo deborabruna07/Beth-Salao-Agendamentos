@@ -1,3 +1,4 @@
+
 export interface Service {
   id: string;
   name: string;
@@ -10,6 +11,8 @@ export interface Service {
 export interface Appointment {
   id: string;
   clientName: string;
+  clientWhatsapp: string; // <--- Add this
+  clientEmail: string;    // <--- Add this
   serviceId: string;
   date: string; // YYYY-MM-DD
   startTime: string; // HH:MM
