@@ -90,16 +90,36 @@ const Admin = () => {
   };
 
   const handleExportCSV = () => {
-    const csv = exportToCSV(appointments, services);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'agendamentos.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Relatório exportado!');
-  };
+
+  const headers = "Cliente;WhatsApp;Serviço;Data;Início;Término;Status\n";
+  const rows = confirmedAppointments.map(appt => {
+    const service = services.find(s => s.id === appt.serviceId);
+    return [
+      appt.clientName,
+      appt.clientWhatsapp,
+      service?.name || 'Serviço',
+      appt.date,
+      appt.startTime,
+      appt.endTime,
+      appt.status
+    ].join(";");
+  }).join("\n");
+
+  const csvContent = "\uFEFF" + headers + rows;
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'relatorio_agendamentos.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  toast.success('Relatório exportado com sucesso!');
+};
 
   const handleClearAll = async () => {
     try {
