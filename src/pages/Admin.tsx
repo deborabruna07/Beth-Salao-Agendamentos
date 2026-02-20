@@ -275,25 +275,28 @@ const Admin = () => {
     })}
 
     {/* Modal de Confirmação de Cancelamento Único */}
-    <AlertDialog 
-      open={!!appointmentToCancel} 
-      onOpenChange={(open) => !open && setAppointmentToCancel(null)}
-    >
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Esta ação irá CANCELAR o agendamento permanentemente.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleClearAll} className="bg-destructive hover:bg-destructive/90">
-                  Sim, cancelar agendamento.
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+<AlertDialog 
+  open={!!appointmentToCancel} 
+  onOpenChange={(open) => !open && setAppointmentToCancel(null)}
+>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Cancelar este agendamento?</AlertDialogTitle>
+      <AlertDialogDescription>
+        Esta ação removerá o agendamento selecionado.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Voltar</AlertDialogCancel>
+      <AlertDialogAction 
+        onClick={handleConfirmCancel} // CHAMA A FUNÇÃO INDIVIDUAL
+        className="bg-destructive text-white"
+      >
+        Confirmar Cancelamento
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
             </div>
 )}
           </motion.div>
