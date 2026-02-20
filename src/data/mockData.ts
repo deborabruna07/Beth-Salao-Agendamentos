@@ -6,5 +6,5 @@ export const closedDays = [0, 1];
 
 export const workingHours = { 
   start: 9, 
-  end: 19
+  end: 18
 };
