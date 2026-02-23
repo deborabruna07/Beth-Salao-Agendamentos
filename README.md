@@ -2,7 +2,7 @@
 
 ## 📌 Visão Geral
 
-O **SGA (Sistema de Gerenciamento e Agendamento para Salão de Beleza)** é uma aplicação web criada para resolver um problema real de salões de beleza:
+O **SGA (Sistema de Gerenciamento e Agendamento)** para Salão de Beleza, é uma aplicação web criada para resolver um problema real de salões de beleza:
 **organizar agendamentos levando em conta serviços com tempo ativo e tempo de espera**, permitindo encaixes inteligentes e evitando conflitos de horário.
 
 O sistema é **dividido em duas áreas bem definidas**:
@@ -125,6 +125,7 @@ http://localhost:8081/
 O sistema gera automaticamente o arquivo **`agendamentos.csv`**, contendo:
 
 * Nome do cliente
+* Nº de telefone do cliente
 * Serviço
 * Data
 * Horário de início
